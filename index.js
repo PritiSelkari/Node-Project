@@ -37,6 +37,7 @@ app.use((req, res, next) => {
                     res.status(400).send({ message: "User not find" })
                     return
                 }
+                req.user = response  
                 next();
             
             })
@@ -90,7 +91,6 @@ app.post("/register", (req, res) => {
 
 })
 
-
 app.put("/update", (req, res) => {
     let query = { emailId: req.query.emailid }
     let data = req.body
@@ -109,7 +109,6 @@ app.delete("/delete/:email", (req, res) => {
         res.status(500).send("Unable to delete data")
     })
 })
-
 
 app.post("/login", (req, res) => {
     let { emailId, password } = req.body
@@ -150,6 +149,12 @@ app.get("/find", (req, res) => {
         res.status(500).send({ message: "Unable to find" })
     })
 })
+
+app.get("/get-profile",(req,res)=>{
+    res.status(200).send(req.user)
+    return
+})
+
 
 app.listen(3000, (err, response) => {
     if (err) {
