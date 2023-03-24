@@ -1,3 +1,4 @@
+const { response } = require("express");
 const mongoose = require("mongoose")
 const userSchema = new mongoose.Schema({
     name : {
@@ -19,4 +20,30 @@ const userSchema = new mongoose.Schema({
     }
 },{timestamps:true})
 const user = mongoose.model("User",userSchema);
+
+user.fetchUser = ()=> {
+    return new Promise((resolve,reject)=>{
+        user.find({},(err,response)=>{
+            if(err){
+                reject(err);
+            } else{
+                resolve(response)
+            }
+        })
+    })
+}
+
+user.registerUser =(query)=>{
+    return new Promise((resolve,reject)=>{
+        user.findOne(query,(err,response)=>{
+            if(err){
+                reject(err)
+            } else{
+                resolve(response)
+            }
+        })
+    })
+}
+
+
 module.exports = user;
