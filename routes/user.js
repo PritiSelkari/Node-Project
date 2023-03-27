@@ -9,7 +9,7 @@ router.post("/register", userController.registerUser)
 
 router.put("/update", userController.updateUser)
 
-router.delete("/delete/:email",userController.deleteUser)
+router.delete("/delete/:ID",userController.deleteUser)
 
 router.post("/login", userController.loginUser)
 

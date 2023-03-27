@@ -2,8 +2,6 @@ const bodyParser = require("body-parser")
 const express = require("express")
 const mongoose = require("mongoose")
 const user = require("./model/user")
-const bcrypt = require("bcrypt")
-const validator = require("email-validator")
 const jwt = require("jsonwebtoken")
 const userRouter = require("./routes/user")
 
@@ -19,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use((req, res, next) => {
     let path =req.path
-    if(["/register","/login"].indexOf(path)!== -1){
+    if(["/user/register","/user/login"].indexOf(path)!== -1){
         return next();
     }
         let token = req.headers.token
@@ -46,7 +44,7 @@ app.use((req, res, next) => {
     
 })
 // routing 
-app.use("/",userRouter)
+app.use("/user",userRouter)
 
 app.listen(3000, (err, response) => {
     if (err) {

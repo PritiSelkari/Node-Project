@@ -1,4 +1,8 @@
 const user = require("../model/user")
+const validator = require("email-validator")
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
+
 
 exports.fetchUser = (req, res) => {
     user.fetchUser({}).then(response => {
@@ -23,16 +27,16 @@ exports.registerUser = (req, res) => {
         return
     }
 
-    user.registerUser({ emailId: emailId }).then(existingData => {
+    user.findUserByEmail({ emailId: emailId }).then(existingData => {
         if (existingData) {
             res.status(400).send({ Message: "Email id already exists" })
             return
         }
-
+    
         bcrypt.genSalt(5).then(salt => {
             bcrypt.hash(password, salt).then(hashPassword => {
                 let userData = { name, emailId, password: hashPassword, age }
-                user.create(userData).then(response => {
+                user.registerUser(userData).then(response => {
                     res.status(200).send({ message: "Registered successfully", data: response })
                 }).catch(err => {
                     res.status(500).send("Unable to register")
@@ -40,22 +44,34 @@ exports.registerUser = (req, res) => {
             })
         })
     }).catch(err => {
+        console.log("error", err)
         res.status(400).send("Unable to register")
     })
 
 }
 exports.updateUser = (req, res) => {
-    let query = { emailId: req.query.emailid }
+    let ID =  req.query.id 
+    if(!ID){
+        res.status(400).send({message:"ID is required"})
+        return
+    }
     let data = req.body
-    user.findOneAndUpdate(query, data, { new: true }).then(response => {
-        res.status(200).send(response)
-    }).catch(err => {
+    user.findUser(ID).then(response=>{ 
+        if(!response) return  res.status(400).send("User not found")
+        user.updateUser(ID,data).then(response => {
+            res.status(200).send({message:"Succesfully updated",data:response})
+        }).catch(err => {
+            res.status(500).send("Unable to update")
+        }) 
+    }).catch(err=>{
         res.status(500).send("Unable to update")
     })
 }
 exports.deleteUser =  (req, res) => {
-
-    user.findOneAndDelete({ emailId: req.params.email }).then(response => {
+    let ID =req.params.ID
+    if(!ID) return res.status(400).send({message:"ID is required"})
+    
+    user.deleteUser(ID).then(response => {
         res.status(200).send({ Message: "Data Deleted successfully", response: response })
     }).catch(err => {
         res.status(500).send("Unable to delete data")
@@ -67,7 +83,7 @@ exports.loginUser = (req, res) => {
         res.status(400).send({ message: "Required fields are missing" })
         return
     }
-    user.findOne({ emailId: emailId }).then(response => {
+    user.findUserByEmail({ emailId: emailId }).then(response => {
         if (!response) {
             res.status(400).send({ message: "User not registered" })
             return
@@ -93,7 +109,7 @@ exports.findUser = (req, res) => {
         res.status(400).send({ message: "User ID is missing" })
         return
     }
-    user.findById(ID).then(response => {
+    user.findUser(ID).then(response => {
         res.status(200).send({ message: "Fetched Successfully", data: response })
     }).catch(err => {
         res.status(500).send({ message: "Unable to find" })
