@@ -12,20 +12,20 @@ exports.fetchUser = (req, res) => {
     })
 }
 exports.registerUser = (req, res) => {
-    let { name, emailId, password, age } = req.body;
-    if (!name || !emailId || !password || !age) {
-        res.status(400).send({ Message: "Required fields are missing" })
-        return
-    }
+     let { name, emailId, password, age } = req.body;
+    // if (!name || !emailId || !password || !age) {
+    //     res.status(400).send({ Message: "Required fields are missing" })
+    //     return
+    // }
     if (!validator.validate(emailId)) {
         res.status(400).send({ Message: "Invalid Email ID" })
         return
     }
 
-    if (password.length < 8) {
-        res.status(400).send({ Message: "Password must contain minimum 8 character" })
-        return
-    }
+    // if (password.length < 8) {
+    //     res.status(400).send({ Message: "Password must contain minimum 8 character" })
+    //     return
+    // }
 
     user.findUserByEmail({ emailId: emailId }).then(existingData => {
         if (existingData) {
@@ -79,10 +79,10 @@ exports.deleteUser =  (req, res) => {
 }
 exports.loginUser = (req, res) => {
     let { emailId, password } = req.body
-    if (!emailId || !password) {
-        res.status(400).send({ message: "Required fields are missing" })
-        return
-    }
+    // if (!emailId || !password) {
+    //     res.status(400).send({ message: "Required fields are missing" })
+    //     return
+    // }
     user.findUserByEmail({ emailId: emailId }).then(response => {
         if (!response) {
             res.status(400).send({ message: "User not registered" })
